@@ -8,20 +8,22 @@ license = "Apache-2.0" # TODO(template) update license if needed
 # TODO(template) update for the crate name
 [workspace]
 members = [
-    "examples",
-    "mycrate",
+    "interfaces",
+    "contracts/contract_a",
+    "contracts/contract_b",
 ]
 resolver = "2"
-default-members = ["mycrate"]
 
 [workspace.dependencies]
+soroban-sdk = { version = "22.0.1", default-features = false }
+interfaces = { path = "./interfaces" }
+contract_a = { path = "./contracts/contract_a" }
+
+[workspace.dev-dependencies]
+soroban-sdk = { version = "22.0.1", features = ["testutils"] }
 
 [workspace.lints.rust]
-missing_docs = "deny"
-# TODO(template) if you use any unsafe code, then running miri in CI is a must
-# if for a crate in the workspace you need an unsafe code
-# prefer to preserve forbid for the workspace
-# and allowing only at a specific crate level 
+#missing_docs = "deny"
 unsafe_code = "forbid"
 
 [workspace.lints.clippy]
@@ -34,3 +36,17 @@ cast_sign_loss = "deny"
 needless_return = "deny"
 panicking_overflow_checks = "deny"
 unwrap_used = "deny"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
